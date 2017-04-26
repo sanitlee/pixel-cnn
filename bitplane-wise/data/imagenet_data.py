@@ -48,7 +48,7 @@ def maybe_download_and_extract(data_dir):
 
 def maybe_preprocess(data_dir):
 
-    npz_file = os.path.join(data_dir, 'imgnet_32x32.npz')
+    npz_file = os.path.join(data_dir, 'imagenet_32x32.npz')
     if os.path.exists(npz_file):
         return # all good
 
@@ -79,7 +79,7 @@ def load(data_dir, subset='train'):
         os.makedirs(data_dir)
     maybe_download_and_extract(data_dir)
     maybe_preprocess(data_dir)
-    imagenet_data = np.load(os.path.join(data_dir,'imgnet_32x32.npz'))
+    imagenet_data = np.load(os.path.join(data_dir,'imagenet_32x32.npz'))
     return imagenet_data['trainx'] if subset == 'train' else imagenet_data['testx']
 
 
@@ -87,10 +87,10 @@ def load(data_dir, subset='train'):
 class DataLoader(object):
     """ an object that generates batches of CIFAR-10 data for training """
 
-    def __init__(self, data_dir, subset, batch_size, rng=None, shuffle=False):
-        """ 
+    def __init__(self, data_dir, subset, batch_size, rng=None, shuffle=False, return_labels=None):
+        """
         - data_dir is location where the files are stored
-        - subset is train|test 
+        - subset is train|test
         - batch_size is int, of #examples to load at once
         - rng is np.random.RandomState object for reproducibility
         """
@@ -99,8 +99,8 @@ class DataLoader(object):
         self.batch_size = batch_size
         self.shuffle = shuffle
 
-        self.data = load(os.path.join(data_dir,'small_imagenet'), subset=subset)
-        
+        self.data = load(os.path.join(data_dir), subset=subset)
+
         self.p = 0 # pointer to where we are in iteration
         self.rng = np.random.RandomState(1) if rng is None else rng
 
@@ -135,3 +135,5 @@ class DataLoader(object):
 
     next = __next__  # Python 2 compatibility (https://stackoverflow.com/questions/29578469/how-to-make-an-object-both-a-python2-and-python3-iterator)
 
+if __name__ == '__main__':
+    maybe_preprocess(sys.argv[1])
